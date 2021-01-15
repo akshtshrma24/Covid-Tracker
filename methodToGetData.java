@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Scanner;
 
 public class methodToGetData
@@ -18,7 +19,7 @@ public class methodToGetData
     }
     public String getData(String stateChoice, String dataLengthChoice) throws IOException {
 
-        if(dataLengthChoice.equals("a"))
+        if(dataLengthChoice.equals("Historic"))
         {
             connect = new URL("https://api.covidtracking.com/v1/states/" + stateChoice + "/daily.json");
         }
@@ -41,17 +42,29 @@ public class methodToGetData
         String result = stringBuffer.toString();
         result = result.replaceAll("<br>", "\n");
         result = result.replaceAll("<[^>]*>", "");
-        int stop = result.indexOf(",\"probableCases\"");
-        result = result.substring(0,stop);
+        try {
+            if(dataLengthChoice.equals("Current")) {
+                JSONObject obj = new JSONObject(result);
+                String date = "" + obj.getInt("date");
+                date = date.substring(0,4) + "/" + date.substring(4,6) + "/" + date.substring(6,8);
+                result = "Date:  " + date + "   Deaths this Day: " + obj.getInt("deathIncrease") + "   Total positive: " + obj.getInt("positive") +   "   Total Deaths: " + obj.getInt("death") + "   Positive Increase: " + obj.getInt("positiveIncrease") + "\n";
+            }
+            else
+            {
+                JSONArray objArray = new JSONArray(result);
+                result = "";
+                for(int i = 0; i < objArray.length(); i++)
+                {
+                    JSONObject temp = objArray.getJSONObject(i);
+                    String date = "" + temp.get("date");
+                    date = date.substring(0,4) + "/" + date.substring(4,6) + "/" + date.substring(6,8);
+                    result += "Date: " + date + "   Deaths this Day: " + temp.get("deathIncrease") + "   Total Positive: " + temp.get("positive") + "   Total Deaths: " + temp.get("death") + "   Positive Increase: " + temp.get("positiveIncrease") + "\n";
 
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return result;
-    }
-    public String getDate(String jSON)
-    {
-        return jSON.substring(jSON.indexOf("date\":") + 5, jSON.indexOf("2") + 7);
-    }
-    public String getTotalCases(String jSON)
-    {
-        return jSON.substring(jSON.indexOf("positive") + 9, jSON.indexOf(","));
     }
 }
