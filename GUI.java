@@ -12,11 +12,13 @@ public class GUI
     public GUI()
     {
         JFrame frame = new JFrame("Covid Data");
-        frame.setSize(500,500);
+        frame.setLayout(new BorderLayout());
+        frame.setSize(800,800);
 
         JPanel panel = new JPanel();
-        panel.setSize(250,250);
+        panel.setSize(100,100);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+
 
         String[] states = {"AL", "AK", "AS", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FM", "FL", "GA", "GU", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MH", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "MP", "OH", "OK", "OR", "PW", "PA", "PR", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VI", "VA", "WA", "WV", "WI", "WY"};
         JComboBox stateList = new JComboBox(states);
@@ -28,7 +30,12 @@ public class GUI
 
         JTextArea textArea = new JTextArea(4,4);
         textArea.setEditable(false);
-        panel.add(textArea);
+        textArea.setSize(100,100);
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setSize(100,100);
+        panel.add(scrollPane);
 
         frame.add(panel);
         frame.setVisible(true);
@@ -51,6 +58,7 @@ public class GUI
                 methodToGetData temp = new methodToGetData();
                 try {
                     result = temp.getData(stateChoice, selection);
+                    System.out.print(stateChoice + "\n" + selection);
                     textArea.setText("");
                     textArea.append(result);
                 } catch (IOException ioException) {
